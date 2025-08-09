@@ -1,6 +1,6 @@
 import boto3
-import ffmpeg
 import os
+from libxmp import XMPFiles, XMPMeta
 
 def lambda_handler(event, context):
     s3 = boto3.client('s3', endpoint_url=os.environ.get('AWS_ENDPOINT_URL', None))
@@ -13,11 +13,18 @@ def lambda_handler(event, context):
     # Descargar el archivo de entrada
     s3.download_file(bucket, input_key, tmp_input)
 
-    # Insertar metadatos XMP usando ffmpeg
-    ffmpeg.input(tmp_input).output(
-        tmp_output,
-        **{'metadata': 'Campo1=Valor1', 'metadata': 'Campo2=Valor2'}
-    ).run(overwrite_output=True)
+    # Crear metadatos XMP
+    xmp = XMPMeta()
+    xmp.set_property('http://ns.smartsolutionslab360.com/xmp/', 'Campo1', 'Valor1')
+    xmp.set_property('http://ns.smartsolutionslab360.com/xmp/', 'Campo2', 'Valor2')
+
+    # Insertar XMP en el archivo MP4
+    xmpfile = XMPFiles(file_path=tmp_input, open_for_update=True)
+    xmpfile.put_xmp(xmp)
+    xmpfile.close_file()
+
+    # Guardar el archivo modificado como salida
+    os.rename(tmp_input, tmp_output)
 
     # Subir el archivo de salida
     s3.upload_file(tmp_output, bucket, output_key)

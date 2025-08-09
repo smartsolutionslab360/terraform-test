@@ -89,11 +89,11 @@ resource "aws_api_gateway_stage" "stage_xmp" {
   stage_name    = "dev"
 }
 
-resource "aws_lambda_layer_version" "ffmpeg_layer" {
-  filename         = "${path.module}/ffmpeg-layer.zip"
-  layer_name       = "ffmpeg-layer"
+resource "aws_lambda_layer_version" "xmp_layer" {
+  filename         = "${path.module}/xmp-layer.zip"
+  layer_name       = "xmp-layer"
   compatible_runtimes = ["python3.9"]
-  source_code_hash = filebase64sha256("${path.module}/ffmpeg-layer.zip")
+  source_code_hash = filebase64sha256("${path.module}/xmp-layer.zip")
 }
 
 resource "aws_lambda_function" "xmp_processor" {
@@ -105,9 +105,9 @@ resource "aws_lambda_function" "xmp_processor" {
   source_code_hash = filebase64sha256("${path.module}/lambda-xmp.zip")
   timeout       = 300
   memory_size   = 1024
-  
-  layers = [aws_lambda_layer_version.ffmpeg_layer.arn]
-  
+
+  layers = [aws_lambda_layer_version.xmp_layer.arn]
+
   environment {
     variables = {
       BUCKET_NAME = "bucket-de-ejemplo"
