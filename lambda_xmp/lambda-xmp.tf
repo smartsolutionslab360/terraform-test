@@ -8,6 +8,7 @@ provider "aws" {
   endpoints {
     lambda = "http://localstack:4566"
     s3     = "http://localstack:4566"
+    apigateway  = "http://localstack:4566"
     iam    = "http://localstack:4566"
   }
 }
