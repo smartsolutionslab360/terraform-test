@@ -12,7 +12,7 @@ provider "aws" {
   secret_key = "test"
   region     = "us-east-1"
   endpoints {
-    s3 = "http://localstack:4566"
+    s3 = "http://host.docker.internal:4566"
   }
 }
 
